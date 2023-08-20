@@ -19,9 +19,9 @@ todos = {}
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     keyboard = types.ReplyKeyboardMarkup(True)
-    button1 = types.KeyboardButton('Add task')
-    button2 = types.KeyboardButton('Show tasks')
-    button3 = types.KeyboardButton('Help')
+    button1 = types.KeyboardButton('add_task')
+    button2 = types.KeyboardButton('show_task')
+    button3 = types.KeyboardButton('help')
     keyboard.add(button1)
     keyboard.add(button2)
     keyboard.add(button3)
