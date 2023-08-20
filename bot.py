@@ -84,7 +84,7 @@ def callback_inline(call: types.CallbackQuery):
             c_date = date.strftime("%d.%m.%Y")
             bot.send_message(chat_id=call.message.chat.id, text=f'You chose {c_date}')
             msg = bot.send_message(chat_id=call.message.chat.id, text='What to plan: ')
-            bot.register_next_step_handler(msg, lambda message: add_task(message, chat_id=call.from_user.id, c_date=c_date))
+            bot.register_next_step_handler(msg, lambda message: add_task(message, chat_id=call.message.chat.id, c_date=c_date))
         elif action == 'CANCEL':
             bot.send_message(chat_id=call.message.chat.id, text='🚫 Cancelled')
 
