@@ -1,22 +1,20 @@
 import telebot
 from telebot import types
-from telebot_calendar import *
-import telebot_calendar
+from telebot_calendar import Calendar, CallbackData, ENGLISH_LANGUAGE
 import datetime
 import os
-import csv
-import uuid
 
-TOKEN = '6177637545:AAH-qY4PytR-CGyCrG_OvpTrckaHpZ5Kv68'
-bot = telebot.TeleBot(TOKEN)
+token = '6177637545:AAH-qY4PytR-CGyCrG_OvpTrckaHpZ5Kv68'
+bot = telebot.TeleBot('6177637545:AAH-qY4PytR-CGyCrG_OvpTrckaHpZ5Kv68')
 calendar = Calendar(language=ENGLISH_LANGUAGE)
 calendar_1 = CallbackData('calendar_1', 'action', 'year', 'month', 'day')
 now = datetime.datetime.now()
-
+# a dictionary that stores all tasks
 todos = {}
 
+# bot start and button output
 @bot.message_handler(commands=['start'])
-def send_welcome(message):
+def start(message):
     keyboard = types.ReplyKeyboardMarkup(True)
     button1 = types.KeyboardButton('Add task')
     button2 = types.KeyboardButton('Show tasks')
@@ -24,13 +22,14 @@ def send_welcome(message):
     keyboard.add(button1)
     keyboard.add(button2)
     keyboard.add(button3)
-    bot.send_message(message.chat.id, 'Hello, ' + message.from_user.first_name + '! This is a NUSPE Manager bot!', reply_markup=keyboard)
+    bot.send_message(message.chat.id, 'Hello, ' + message.from_user.first_name + '!', reply_markup=keyboard)
+
 
 @bot.message_handler(commands=['help'])
-def send_hello(message):
-    bot.reply_to(message, "Please add in a task, the deadlines, and who you assign the task to!")
-    
-    
+def hepling(message):
+    bot.send_message(message.chat.id, '''
+⏰ Add reminders so you don't forget important things
+''')
 
 # task deletion function
 def delete_task(chat_id, c_date, task):
@@ -45,13 +44,13 @@ def delete_task(chat_id, c_date, task):
 
 @bot.message_handler(content_types=['text'])
 def call(message):
-    if message.text == '/add_task':
+    if message.text == 'Add task':
         bot.send_message(message.chat.id, 'Which date do you want to add a task to?', reply_markup=calendar.create_calendar(
             name=calendar_1.prefix,
             year=now.year,
             month=now.month)
                          )
-    elif message.text == '/show_task':
+    elif message.text == 'Show tasks':
         if not todos.get(message.chat.id):
             bot.send_message(message.chat.id, 'No tasks')
         else:
@@ -65,6 +64,12 @@ def call(message):
                             button = types.InlineKeyboardButton(text=f'❌ {task}', callback_data=f'delete:{date}:{task}')
                             keyboard.add(button)
                         bot.send_message(message.chat.id, text, reply_markup=keyboard)
+    elif message.text == 'Help':
+        bot.send_message(message.chat.id, '''
+⏰ Add reminders so you don't forget important things
+''')
+    else:
+        bot.send_message(message.chat.id, "🙄 I don't understand... Press 'Add task' in the menu")
 
 # deletes the task and displays a message about the successful deletion of this task.
 @bot.callback_query_handler(func=lambda call: call.data.startswith('delete:'))
