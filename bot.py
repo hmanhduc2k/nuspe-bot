@@ -78,15 +78,15 @@ def delete_callback(call):
 @bot.callback_query_handler(func=lambda call: call.data.startswith(calendar_1.prefix))
 def callback_inline(call: types.CallbackQuery):
     name, action, year, month, day = call.data.split(calendar_1.sep)
-    date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month,
-                                           day=day)
-    if action == 'DAY':
-        c_date = date.strftime("%d.%m.%Y")
-        bot.send_message(chat_id=call.from_user.id, text=f'You chose {c_date}')
-        msg = bot.send_message(chat_id=call.from_user.id, text='What to plan: ')
-        bot.register_next_step_handler(msg, lambda message: add_task(message, chat_id=call.from_user.id, c_date=c_date))
-    elif action == 'CANCEL':
-        bot.send_message(chat_id=call.from_user.id, text='🚫 Cancelled')
+    date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
+    if call.message.chat.type == 'group' or call.message.chat.type == 'supergroup':
+        if action == 'DAY':
+            c_date = date.strftime("%d.%m.%Y")
+            bot.send_message(chat_id=call.message.chat.id, text=f'You chose {c_date}')
+            msg = bot.send_message(chat_id=call.message.chat.id, text='What to plan: ')
+            bot.register_next_step_handler(msg, lambda message: add_task(message, chat_id=call.from_user.id, c_date=c_date))
+        elif action == 'CANCEL':
+            bot.send_message(chat_id=call.message.chat.id, text='🚫 Cancelled')
 
 # the function of adding a new task
 def add_task(message, chat_id, c_date):
