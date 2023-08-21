@@ -103,7 +103,7 @@ def show_tasks(message):
 def delete_task(chat_id, c_date, task):
     target = session.query(Tasks).filter_by(chat_id=chat_id, task_deadlines=c_date, task_name=task)
     if target:
-        target.status = 'deleted'
+        target.delete()
         session.commit()
         print('Task deleted')
     # if todos.get(chat_id) is not None:
