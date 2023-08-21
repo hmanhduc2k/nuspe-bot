@@ -148,13 +148,14 @@ def send_reminders():
     
     tasks = session.query(Tasks).all()
     for task in tasks:
-        event_date = task.task_deadlines
-        time_diff = event_date - now
+        bot.send_message(task.chat_id, f"Reminder: Your task is in 1 minutes time!")
+        # event_date = task.task_deadlines
+        # time_diff = event_date - now
 
-        if timedelta(minutes=0) < time_diff < reminder_range:
-            chat_id = task.chat_id
-            days_until_event = time_diff.minutes
-            bot.send_message(chat_id, f"Reminder: Your task is in {days_until_event} time!")
+        # if timedelta(minutes=0) < time_diff < reminder_range:
+        #     chat_id = task.chat_id
+        #     days_until_event = time_diff.minutes
+        #     bot.send_message(chat_id, f"Reminder: Your task is in {days_until_event} time!")
 
 # Schedule reminders to be sent every day at a specific time
 schedule.every(1).minutes.do(send_reminders)
