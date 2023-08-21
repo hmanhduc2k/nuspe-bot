@@ -65,6 +65,7 @@ def callback_inline(call: types.CallbackQuery):
 @bot.message_handler(commands=['show_task'])
 def show_tasks(message):
     filtered = []
+    print('Show tasks called')
     with open('data/tasks.csv', 'r') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
