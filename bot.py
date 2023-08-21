@@ -69,7 +69,7 @@ def show_tasks(message):
     with open('data/tasks.csv', 'r') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
-            print(row)
+            print(row['chat_id'], row['status'])
             if row['chat_id'] == message.chat.id and row['status'] == 'ongoing':
                 filtered.append(row)
                 
