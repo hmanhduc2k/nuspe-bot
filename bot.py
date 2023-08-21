@@ -120,7 +120,7 @@ def delete_task(chat_id, c_date, task):
 @bot.callback_query_handler(func=lambda call: call.data.startswith('delete@@'))
 def delete_callback(call):
     print(call.data.split('@@'))
-    _, date, task = call.data.split('@@')
+    _, task, date = call.data.split('@@')
     delete_task(call.message.chat.id, date, task)
     bot.answer_callback_query(call.id, text=f'Task "{task}" on {date} deleted')
 
