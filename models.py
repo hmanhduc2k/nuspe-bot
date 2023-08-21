@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import create_engine, Column, Integer, String, TIMESTAMP, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, TIMESTAMP, Date
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -20,7 +20,7 @@ class Tasks(Base):
     chat_id = Column(String)
     task_name = Column(String)
     task_assignee = Column(String, default='None')
-    task_deadlines = Column(DateTime)
+    task_deadlines = Column(Date)
     task_remarks = Column(String, default='None')
     status = Column(String, default='ongoing')
         
