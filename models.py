@@ -7,7 +7,7 @@ import os
 
 DATABASE_URL = os.environ['DATABASE_URL1']
 
-engine = create_engine(DATABASE_URL, sslmode='require')
+engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 
 Base = declarative_base()
