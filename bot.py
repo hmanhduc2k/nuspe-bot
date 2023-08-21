@@ -10,7 +10,10 @@ import os
 import csv
 import uuid
 from collections import defaultdict
+from models import Tasks
+from models import Session
 
+session = Session()
 
 TOKEN = '6177637545:AAH-qY4PytR-CGyCrG_OvpTrckaHpZ5Kv68'
 bot = telebot.TeleBot(TOKEN)
@@ -134,7 +137,9 @@ def add_todo(chat_id, c_date, message):
     #         todos[chat_id][c_date] = [task]
     # else:
     #     todos[chat_id] = {c_date: [task]}
-        
+    obj = Tasks(uuid.uuid4(), chat_id, task, 'None', c_date, 'None', 'ongoing')
+    session.add(obj)
+    session.commit()
     with open('data/tasks.csv', 'a') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow([uuid.uuid4(), chat_id, task, 'None', c_date, 'None', 'ongoing'])
@@ -148,15 +153,6 @@ class Tasks:
         self.task_assignee = task_assignee
         self.task_deadlines = task_deadlines
         self.task_remarks = task_remarks
-        
-        with open('data/tasks.csv', 'a') as csv_file:
-            csv_writer = csv.writer(csv_file)
-
-            # Write the new data to the CSV file
-            csv_writer.writerow([self.task_id, self.chat_id, self.task_name, self.task_assignee, self.task_deadlines, self.task_remarks])
-            
-    # @staticmethod
-    # def fitler():
         
 # def send_reminders():
 #     now = datetime.now()
