@@ -44,6 +44,11 @@ def add_tasks(message):
                 month=now.month)
             )
     
+    
+@bot.message.handler(commands=['huyen'])
+def reply_to_huyen(message):
+    bot.reply_to(message, "Anh yêu em nhiều lắm Huyền ơi!!! Anh chỉ muốn hôn em và nắm tay em nhiều hơn nữa :)))")
+    
 @bot.message_handler(commands=['fuck_you'])
 def reply_to_fu(message):
     bot.reply_to(message, 'Do not worry brother, NUSPE will never leave you or fk you alone <3')
