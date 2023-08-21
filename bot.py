@@ -157,10 +157,9 @@ def send_reminders():
             bot.send_message(chat_id, f"Reminder: Your task is in {days_until_event} time!")
 
 # Schedule reminders to be sent every day at a specific time
-schedule.every().day.at("10:00").do(send_reminders)
+schedule.every(1).minutes.do(send_reminders)
 
+bot.polling(none_stop=True)
 while True:
     schedule.run_pending()
     time.sleep(1)
-
-bot.polling(none_stop=True)
