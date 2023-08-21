@@ -9,13 +9,14 @@ import time
 import os
 import csv
 import uuid
+from collections import defaultdict
+
 
 TOKEN = '6177637545:AAH-qY4PytR-CGyCrG_OvpTrckaHpZ5Kv68'
 bot = telebot.TeleBot(TOKEN)
 calendar = Calendar(language=ENGLISH_LANGUAGE)
 calendar_1 = CallbackData('calendar_1', 'action', 'year', 'month', 'day')
 now = datetime.datetime.now()
-
 
 todos = {}
 
@@ -34,49 +35,19 @@ def send_welcome(message):
 def send_hello(message):
     bot.reply_to(message, "Please add in a task, the deadlines, and who you assign the task to!")
     
+@bot.message_handler(commands=['add_task'])
+def add_tasks(message):
+    bot.send_message(message.chat.id, 'Which date do you want to add a task to?', 
+            reply_markup=calendar.create_calendar(
+                name=calendar_1.prefix,
+                year=now.year,
+                month=now.month)
+            )
     
-
-# task deletion function
-def delete_task(chat_id, c_date, task):
-    if todos.get(chat_id) is not None:
-        if todos[chat_id].get(c_date) is not None:
-            todos[chat_id][c_date].remove(task)
-            if len(todos[chat_id][c_date]) == 0:
-                del todos[chat_id][c_date]
-            if len(todos[chat_id]) == 0:
-                del todos[chat_id]
-
-
-@bot.message_handler(content_types=['text'])
-def call(message):
-    if message.text == '/add_task':
-        bot.send_message(message.chat.id, 'Which date do you want to add a task to?', reply_markup=calendar.create_calendar(
-            name=calendar_1.prefix,
-            year=now.year,
-            month=now.month)
-                         )
-    elif message.text == '/show_task':
-        if not todos.get(message.chat.id):
-            bot.send_message(message.chat.id, 'No tasks')
-        else:
-            
-            for chat_id, dates in todos.items():
-                if chat_id == message.chat.id:
-                    for date, tasks in dates.items():
-                        tasks_text = '\n'.join(f'- {task}' for task in tasks)
-                        text = f'Tasks for {date}:\n{tasks_text}'
-                        keyboard = types.InlineKeyboardMarkup()
-                        for task in tasks:
-                            button = types.InlineKeyboardButton(text=f'❌ {task}', callback_data=f'delete:{date}:{task}')
-                            keyboard.add(button)
-                        bot.send_message(message.chat.id, text, reply_markup=keyboard)
-
-# deletes the task and displays a message about the successful deletion of this task.
-@bot.callback_query_handler(func=lambda call: call.data.startswith('delete:'))
-def delete_callback(call):
-    _, date, task = call.data.split(':')
-    delete_task(call.message.chat.id, date, task)
-    bot.answer_callback_query(call.id, text=f'Task "{task}" on {date} deleted')
+@bot.message_handler(commands=['fuck_you'])
+def reply_to_fu(message):
+    bot.reply_to(message, 'Do not worry brother, NUSPE will never leave you or fk you alone <3')
+    
 
 # the function is a callback request handler. It is called when you click on the calendar buttons
 @bot.callback_query_handler(func=lambda call: call.data.startswith(calendar_1.prefix))
@@ -86,32 +57,80 @@ def callback_inline(call: types.CallbackQuery):
     if call.message.chat.type == 'group' or call.message.chat.type == 'supergroup':
         if action == 'DAY':
             c_date = date.strftime("%d.%m.%Y")
-            bot.send_message(chat_id=call.message.chat.id, text=f'You chose {c_date}')
-            msg = bot.send_message(chat_id=call.message.chat.id, text='What to plan: ')
+            msg = bot.send_message(chat_id=call.message.chat.id, text=f'You chose {c_date}, please enter your plan: ')
             bot.register_next_step_handler(msg, lambda message: add_task(message, chat_id=call.message.chat.id, c_date=c_date))
         elif action == 'CANCEL':
             bot.send_message(chat_id=call.message.chat.id, text='🚫 Cancelled')
+    
+@bot.message_handler(commands=['show_task'])
+def show_tasks(message):
+    filtered = []
+    with open('data/tasks.csv', 'r') as csvfile:
+        csvreader = csv.DictReader(csvfile)
+        for row in csvreader:
+            if row['chat_id'] == message.chat.id and row['status'] == 'ongoing':
+                filtered.append(row)
+                
+        if filtered == []:
+            bot.send_message(message.chat.id, 'No task is available now')
+    
+        dates = defaultdict(list)
+        for value in filtered:
+            date = value['task_deadlines']
+            print(date)
+            dates[date].append(value['task_name'] + ', assigned to ' + value['task_assignee'])
+            
+        for date, tasks in dates.items():
+            tasks_text = '\n'.join(f'- {task}' for task in tasks)
+            text = f'Tasks for {date}:\n{tasks_text}'
+            keyboard = types.InlineKeyboardMarkup()
+            for task in tasks:
+                button = types.InlineKeyboardButton(text=f'❌ {task}', callback_data=f'FXdelete:{date}:{task}')
+                keyboard.add(button)
+            bot.send_message(message.chat.id, text, reply_markup=keyboard)
+
+# task deletion function
+def delete_task(chat_id, c_date, task):
+    with open('data/tasks.csv', 'a') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow([uuid.uuid4(), chat_id, task, 'None', c_date, 'None', 'ongoing'])
+    # if todos.get(chat_id) is not None:
+    #     if todos[chat_id].get(c_date) is not None:
+    #         todos[chat_id][c_date].remove(task)
+    #         if len(todos[chat_id][c_date]) == 0:
+    #             del todos[chat_id][c_date]
+    #         if len(todos[chat_id]) == 0:
+    #             del todos[chat_id]
+        
+
+# deletes the task and displays a message about the successful deletion of this task.
+@bot.callback_query_handler(func=lambda call: call.data.startswith('FXdelete:'))
+def delete_callback(call):
+    _, date, task = call.data.split(':')
+    delete_task(call.message.chat.id, date, task)
+    bot.answer_callback_query(call.id, text=f'Task "{task}" on {date} deleted')
+
 
 # the function of adding a new task
 def add_task(message, chat_id, c_date):
     add_todo(chat_id, c_date, message)
-    text = f'Task successfully added on {c_date}'
+    text = f'Task successfully registered on {c_date}'
     bot.send_message(chat_id=chat_id, text=text)
 
 # the function adds a task to the todos dictionary
 def add_todo(chat_id, c_date, message):
     task = message.text
-    if todos.get(chat_id) is not None:
-        if todos[chat_id].get(c_date) is not None:
-            todos[chat_id][c_date].append(task)
-        else:
-            todos[chat_id][c_date] = [task]
-    else:
-        todos[chat_id] = {c_date: [task]}
+    # if todos.get(chat_id) is not None:
+    #     if todos[chat_id].get(c_date) is not None:
+    #         todos[chat_id][c_date].append(task)
+    #     else:
+    #         todos[chat_id][c_date] = [task]
+    # else:
+    #     todos[chat_id] = {c_date: [task]}
         
     with open('data/tasks.csv', 'a') as csvfile:
         csvwriter = csv.writer(csvfile)
-        csvwriter.writerow([uuid.uuid4(), chat_id, task, 'None', c_date, 'None'])
+        csvwriter.writerow([uuid.uuid4(), chat_id, task, 'None', c_date, 'None', 'ongoing'])
      
 
 class Tasks:
