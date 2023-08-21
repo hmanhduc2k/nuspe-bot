@@ -65,7 +65,10 @@ def callback_inline(call: types.CallbackQuery):
     if action == 'DAY':
         c_date = date.strftime("%d.%m.%Y")
         msg = bot.send_message(chat_id=call.message.chat.id, text=f'You chose {c_date}, please enter your plan.\nFormat your plan this way: task_name|assignee|remarks: ')
-        bot.register_next_step_handler(msg, lambda message: add_task(message, chat_id=call.message.chat.id, c_date=c_date))
+        try:
+            bot.register_next_step_handler(msg, lambda message: add_task(message, chat_id=call.message.chat.id, c_date=c_date))
+        except:
+            bot.send_message('Error occurred! Please format your plan this way: [task name]|[assignee]|[remarks], leave blank but keep the | if do not have')
     elif action == 'CANCEL':
         bot.send_message(chat_id=call.message.chat.id, text='🚫 Cancelled')
     
