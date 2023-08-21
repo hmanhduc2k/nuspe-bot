@@ -143,6 +143,7 @@ def add_todo(chat_id, c_date, message):
     session.commit()
         
 def send_reminders():
+    print('reached further')
     now = datetime.now()
     reminder_range = timedelta(minutes=1)
     
