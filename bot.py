@@ -137,7 +137,13 @@ def add_todo(chat_id, c_date, message):
     #         todos[chat_id][c_date] = [task]
     # else:
     #     todos[chat_id] = {c_date: [task]}
-    obj = Tasks(chat_id, task, 'None', c_date, 'None')
+    obj = Tasks(
+        chat_id=chat_id, 
+        task_name=task, 
+        task_assignee='None', 
+        task_deadlines=c_date, 
+        task_remarks='None'
+    )
     session.add(obj)
     session.commit()
     with open('data/tasks.csv', 'a') as csvfile:
