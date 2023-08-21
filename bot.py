@@ -3,6 +3,9 @@ from telebot import types
 from telebot_calendar import *
 import telebot_calendar
 import datetime
+from datetime import timedelta
+import schedule
+import time
 import os
 import csv
 import uuid
@@ -56,6 +59,7 @@ def call(message):
         if not todos.get(message.chat.id):
             bot.send_message(message.chat.id, 'No tasks')
         else:
+            
             for chat_id, dates in todos.items():
                 if chat_id == message.chat.id:
                     for date, tasks in dates.items():
@@ -104,5 +108,49 @@ def add_todo(chat_id, c_date, message):
             todos[chat_id][c_date] = [task]
     else:
         todos[chat_id] = {c_date: [task]}
+        
+    with open('data/tasks.csv', 'a') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow([uuid.uuid4(), chat_id, task, 'None', c_date, 'None'])
+     
+
+class Tasks:
+    def __init__(self, chat_id, task_name, task_assignee, task_deadlines, task_remarks):
+        self.task_id = uuid.uuid4()
+        self.chat_id = chat_id
+        self.task_name = task_name
+        self.task_assignee = task_assignee
+        self.task_deadlines = task_deadlines
+        self.task_remarks = task_remarks
+        
+        with open('data/tasks.csv', 'a') as csv_file:
+            csv_writer = csv.writer(csv_file)
+
+            # Write the new data to the CSV file
+            csv_writer.writerow([self.task_id, self.chat_id, self.task_name, self.task_assignee, self.task_deadlines, self.task_remarks])
+            
+    # @staticmethod
+    # def fitler():
+        
+# def send_reminders():
+#     now = datetime.now()
+#     reminder_range = timedelta(minutes=1)
+    
+#     events = 
+#     for event in events:
+#         event_date = event['event_date']
+#         time_diff = event_date - now
+
+#         if timedelta(days=0) < time_diff < reminder_range:
+#             chat_id = event['chat_id']
+#             days_until_event = time_diff.days
+#             bot.send_message(chat_id, f"Reminder: Your event is in {days_until_event} days!")
+
+# # Schedule reminders to be sent every day at a specific time
+# schedule.every().day.at("10:00").do(send_reminders)
+
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
 
 bot.polling(none_stop=True)

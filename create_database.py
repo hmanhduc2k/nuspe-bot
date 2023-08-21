@@ -2,7 +2,7 @@ import csv
 import os
 
 # Define the field names
-task_fields = ['task_id', 'task_name', 'task_assignee', 'task_deadlines', 'task_remarks']
+task_fields = ['task_id', 'chat_id', 'task_name', 'task_assignee', 'task_deadlines', 'task_remarks']
 event_fields = ['event_id', 'event_name', 'event_start', 'event_end', 'event_remarks']
 
 # Define data to be added or updated
