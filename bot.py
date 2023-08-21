@@ -137,22 +137,12 @@ def add_todo(chat_id, c_date, message):
     #         todos[chat_id][c_date] = [task]
     # else:
     #     todos[chat_id] = {c_date: [task]}
-    obj = Tasks(uuid.uuid4(), chat_id, task, 'None', c_date, 'None', 'ongoing')
+    obj = Tasks(chat_id, task, 'None', c_date, 'None')
     session.add(obj)
     session.commit()
     with open('data/tasks.csv', 'a') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow([uuid.uuid4(), chat_id, task, 'None', c_date, 'None', 'ongoing'])
-     
-
-class Tasks:
-    def __init__(self, chat_id, task_name, task_assignee, task_deadlines, task_remarks):
-        self.task_id = uuid.uuid4()
-        self.chat_id = chat_id
-        self.task_name = task_name
-        self.task_assignee = task_assignee
-        self.task_deadlines = task_deadlines
-        self.task_remarks = task_remarks
         
 # def send_reminders():
 #     now = datetime.now()
