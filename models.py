@@ -7,12 +7,13 @@ import os
 
 DATABASE_URL = os.environ['DATABASE_URL1']
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, sslmode='require')
 Session = sessionmaker(bind=engine)
 
 Base = declarative_base()
 
 class Tasks:
+    __tablename__ = 'tasks'
     def __init__(self, chat_id, task_name, task_assignee, task_deadlines, task_remarks):
         self.task_id = uuid.uuid4()
         self.chat_id = chat_id
