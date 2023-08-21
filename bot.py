@@ -54,13 +54,12 @@ def reply_to_fu(message):
 def callback_inline(call: types.CallbackQuery):
     name, action, year, month, day = call.data.split(calendar_1.sep)
     date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
-    if call.message.chat.type == 'group' or call.message.chat.type == 'supergroup':
-        if action == 'DAY':
-            c_date = date.strftime("%d.%m.%Y")
-            msg = bot.send_message(chat_id=call.message.chat.id, text=f'You chose {c_date}, please enter your plan: ')
-            bot.register_next_step_handler(msg, lambda message: add_task(message, chat_id=call.message.chat.id, c_date=c_date))
-        elif action == 'CANCEL':
-            bot.send_message(chat_id=call.message.chat.id, text='🚫 Cancelled')
+    if action == 'DAY':
+        c_date = date.strftime("%d.%m.%Y")
+        msg = bot.send_message(chat_id=call.message.chat.id, text=f'You chose {c_date}, please enter your plan: ')
+        bot.register_next_step_handler(msg, lambda message: add_task(message, chat_id=call.message.chat.id, c_date=c_date))
+    elif action == 'CANCEL':
+        bot.send_message(chat_id=call.message.chat.id, text='🚫 Cancelled')
     
 @bot.message_handler(commands=['show_task'])
 def show_tasks(message):
@@ -157,7 +156,11 @@ class Tasks:
 # def send_reminders():
 #     now = datetime.now()
 #     reminder_range = timedelta(minutes=1)
-    
+#     with open('data/tasks.csv', 'r') as csvfile:
+#         csvreader = csv.DictReader(csvfile)
+#         for row in csvreader:
+#             if row['chat_id'] == str(message.chat.id) and row['status'] == 'ongoing':
+#                 filtered.append(row)
 #     events = 
 #     for event in events:
 #         event_date = event['event_date']
