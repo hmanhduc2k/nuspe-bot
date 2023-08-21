@@ -137,6 +137,7 @@ def add_todo(chat_id, c_date, message):
     #         todos[chat_id][c_date] = [task]
     # else:
     #     todos[chat_id] = {c_date: [task]}
+    print(c_date)
     obj = Tasks(
         chat_id=chat_id, 
         task_name=task, 
