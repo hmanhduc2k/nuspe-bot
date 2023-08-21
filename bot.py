@@ -122,6 +122,7 @@ def delete_callback(call):
     print(call.data.split('@@'))
     _, temp = call.data.split('@@')
     date, task = temp.split(',')
+    print(temp.split(','))
     delete_task(call.message.chat.id, date, task)
     bot.answer_callback_query(call.id, text=f'Task "{task}" on {date} deleted')
 
