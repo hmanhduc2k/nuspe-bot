@@ -101,8 +101,7 @@ def show_tasks(message):
 
 # task deletion function
 def delete_task(chat_id, c_date, task):
-    date_obj = datetime.datetime.strptime(c_date, "%d.%m.%Y")
-    target = session.query(Tasks).filter_by(chat_id=chat_id, task_deadlines=date_obj, task_name=task)
+    target = session.query(Tasks).filter_by(chat_id=chat_id, task_deadlines=c_date, task_name=task)
     if target:
         target.status = 'deleted'
         session.commit()
