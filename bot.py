@@ -64,7 +64,7 @@ def callback_inline(call: types.CallbackQuery):
     date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
     if action == 'DAY':
         c_date = date.strftime("%d.%m.%Y")
-        msg = bot.send_message(chat_id=call.message.chat.id, text=f'You chose {c_date}, please enter your plan: ')
+        msg = bot.send_message(chat_id=call.message.chat.id, text=f'You chose {c_date}, please enter your plan.\nFormat your plan this way: task_name|assignee|remarks: ')
         bot.register_next_step_handler(msg, lambda message: add_task(message, chat_id=call.message.chat.id, c_date=c_date))
     elif action == 'CANCEL':
         bot.send_message(chat_id=call.message.chat.id, text='🚫 Cancelled')
@@ -107,13 +107,6 @@ def delete_task(chat_id, c_date, task):
         session.delete(target)
         session.commit()
         print('Task deleted')
-    # if todos.get(chat_id) is not None:
-    #     if todos[chat_id].get(c_date) is not None:
-    #         todos[chat_id][c_date].remove(task)
-    #         if len(todos[chat_id][c_date]) == 0:
-    #             del todos[chat_id][c_date]
-    #         if len(todos[chat_id]) == 0:
-    #             del todos[chat_id]
         
 
 # deletes the task and displays a message about the successful deletion of this task.
@@ -122,7 +115,7 @@ def delete_callback(call):
     print(call.data.split('@@'))
     _, task, date = call.data.split('@@')
     delete_task(call.message.chat.id, date, task)
-    bot.answer_callback_query(call.id, text=f'Task "{task}" on {date} deleted')
+    bot.answer_callback_query(call.id, text=f'Task "{task}" on {date} deleted. Please restart by typing /show_task again')
 
 
 # the function of adding a new task
@@ -133,22 +126,15 @@ def add_task(message, chat_id, c_date):
 
 # the function adds a task to the todos dictionary
 def add_todo(chat_id, c_date, message):
-    task = message.text
-    # if todos.get(chat_id) is not None:
-    #     if todos[chat_id].get(c_date) is not None:
-    #         todos[chat_id][c_date].append(task)
-    #     else:
-    #         todos[chat_id][c_date] = [task]
-    # else:
-    #     todos[chat_id] = {c_date: [task]}
+    task, assignee, remarks = message.text.split('|')
     print(c_date)
     date_obj = datetime.datetime.strptime(c_date, "%d.%m.%Y")
     obj = Tasks(
         chat_id=chat_id, 
         task_name=task, 
-        task_assignee='None', 
+        task_assignee=assignee, 
         task_deadlines=date_obj, 
-        task_remarks='None'
+        task_remarks=remarks
     )
     session.add(obj)
     session.commit()
