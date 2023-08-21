@@ -71,39 +71,42 @@ def callback_inline(call: types.CallbackQuery):
     
 @bot.message_handler(commands=['show_task'])
 def show_tasks(message):
-    filtered = []
+    filtered = session.query(Tasks).filter_by(chat_id=str(message.chat.id), status='ongoing').all()
     print('Show tasks called', message.chat.id)
-    with open('data/tasks.csv', 'r') as csvfile:
-        csvreader = csv.DictReader(csvfile)
-        for row in csvreader:
-            if row['chat_id'] == str(message.chat.id) and row['status'] == 'ongoing':
-                filtered.append(row)
+    # with open('data/tasks.csv', 'r') as csvfile:
+    #     csvreader = csv.DictReader(csvfile)
+    #     for row in csvreader:
+    #         if row['chat_id'] == str(message.chat.id) and row['status'] == 'ongoing':
+    #             filtered.append(row)
                 
-        if filtered == []:
-            bot.send_message(message.chat.id, 'No task is available now')
-    
-        dates = defaultdict(list)
-        for value in filtered:
-            date = value['task_deadlines']
-            print(date)
-            dates[date].append(value['task_name'] + ', assigned to ' + value['task_assignee'])
-            
-        print(dates)
-            
-        for date, tasks in dates.items():
-            tasks_text = '\n'.join(f'- {task}' for task in tasks)
-            text = f'Tasks for {date}:\n{tasks_text}'
-            keyboard = types.InlineKeyboardMarkup()
-            for task in tasks:
-                button = types.InlineKeyboardButton(text=f'❌', callback_data=f'delete:{date}:{task}')
-                keyboard.add(button)
-            bot.send_message(message.chat.id, text, reply_markup=keyboard)
+    if filtered == []:
+        bot.send_message(message.chat.id, 'No task is available now')
+
+    dates = defaultdict(list)
+    for value in filtered:
+        date = value.task_deadlines
+        print(date)
+        dates[date].append(value.task_name + ', assigned to ' + value.task_assignee)
+        
+    print(dates)
+        
+    for date, tasks in dates.items():
+        tasks_text = '\n'.join(f'- {task}' for task in tasks)
+        text = f'Tasks for {date}:\n{tasks_text}'
+        keyboard = types.InlineKeyboardMarkup()
+        for task in tasks:
+            button = types.InlineKeyboardButton(text=f'❌', callback_data=f'delete:{date}:{task}')
+            keyboard.add(button)
+        bot.send_message(message.chat.id, text, reply_markup=keyboard)
 
 # task deletion function
 def delete_task(chat_id, c_date, task):
-    with open('data/tasks.csv', 'a') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow([chat_id, task, 'None', c_date, 'None'])
+    date_obj = datetime.datetime.strptime(c_date, "%d.%m.%Y")
+    target = session.query(Tasks).filter_by(chat_id=chat_id, task_deadlines=date_obj, task_name=task)
+    if target:
+        target.status = 'deleted'
+        session.commit()
+        print('Task deleted')
     # if todos.get(chat_id) is not None:
     #     if todos[chat_id].get(c_date) is not None:
     #         todos[chat_id][c_date].remove(task)
@@ -148,9 +151,6 @@ def add_todo(chat_id, c_date, message):
     )
     session.add(obj)
     session.commit()
-    with open('data/tasks.csv', 'a') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow([uuid.uuid4(), chat_id, task, 'None', c_date, 'None', 'ongoing'])
         
 # def send_reminders():
 #     now = datetime.now()
