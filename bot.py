@@ -125,7 +125,7 @@ def add_task(message, chat_id, c_date):
         text = f'Task successfully registered on {c_date}'
         bot.send_message(chat_id=chat_id, text=text)
     except:
-        bot.send_message('Error occurred! Please format your plan this way: [task name]|[assignee]|[remarks], leave blank but keep the | if do not have')
+        bot.send_message(chat_id=chat_id, text='Error occurred! Please format your plan this way: [task name]|[assignee]|[remarks], leave blank but keep the | if do not have')
 
 # the function adds a task to the todos dictionary
 def add_todo(chat_id, c_date, message):
