@@ -138,11 +138,12 @@ def add_todo(chat_id, c_date, message):
     # else:
     #     todos[chat_id] = {c_date: [task]}
     print(c_date)
+    date_obj = datetime.strptime(c_date, "%d.%m.%Y")
     obj = Tasks(
         chat_id=chat_id, 
         task_name=task, 
         task_assignee='None', 
-        task_deadlines=c_date, 
+        task_deadlines=date_obj, 
         task_remarks='None'
     )
     session.add(obj)
