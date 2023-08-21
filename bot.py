@@ -142,29 +142,25 @@ def add_todo(chat_id, c_date, message):
     session.add(obj)
     session.commit()
         
-# def send_reminders():
-#     now = datetime.now()
-#     reminder_range = timedelta(minutes=1)
-#     with open('data/tasks.csv', 'r') as csvfile:
-#         csvreader = csv.DictReader(csvfile)
-#         for row in csvreader:
-#             if row['chat_id'] == str(message.chat.id) and row['status'] == 'ongoing':
-#                 filtered.append(row)
-#     events = 
-#     for event in events:
-#         event_date = event['event_date']
-#         time_diff = event_date - now
+def send_reminders():
+    now = datetime.now()
+    reminder_range = timedelta(minutes=1)
+    
+    tasks = session.query(Tasks).all()
+    for task in tasks:
+        event_date = task.task_deadlines
+        time_diff = event_date - now
 
-#         if timedelta(days=0) < time_diff < reminder_range:
-#             chat_id = event['chat_id']
-#             days_until_event = time_diff.days
-#             bot.send_message(chat_id, f"Reminder: Your event is in {days_until_event} days!")
+        if timedelta(minutes=0) < time_diff < reminder_range:
+            chat_id = task.chat_id
+            days_until_event = time_diff.minutes
+            bot.send_message(chat_id, f"Reminder: Your task is in {days_until_event} time!")
 
-# # Schedule reminders to be sent every day at a specific time
-# schedule.every().day.at("10:00").do(send_reminders)
+# Schedule reminders to be sent every day at a specific time
+schedule.every().day.at("10:00").do(send_reminders)
 
-# while True:
-#     schedule.run_pending()
-#     time.sleep(1)
+while True:
+    schedule.run_pending()
+    time.sleep(1)
 
 bot.polling(none_stop=True)
