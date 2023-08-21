@@ -69,9 +69,8 @@ def show_tasks(message):
     with open('data/tasks.csv', 'r') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
-            print(row['chat_id'], row['status'])
+            print(row['chat_id'] == message.chat.id, row['status'] == 'ongoing')
             if row['chat_id'] == message.chat.id and row['status'] == 'ongoing':
-                print('reached here already')
                 filtered.append(row)
                 
         if filtered == []:
