@@ -12,7 +12,7 @@ Session = sessionmaker(bind=engine)
 
 Base = declarative_base()
 
-class Tasks:
+class Tasks(Base):
     __tablename__ = 'tasks'
     def __init__(self, chat_id, task_name, task_assignee, task_deadlines, task_remarks):
         self.task_id = uuid.uuid4()
