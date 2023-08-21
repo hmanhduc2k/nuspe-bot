@@ -148,6 +148,7 @@ def send_reminders():
     
     tasks = session.query(Tasks).all()
     for task in tasks:
+        print('reached')
         bot.send_message(task.chat_id, f"Reminder: Your task is in 1 minutes time!")
         # event_date = task.task_deadlines
         # time_diff = event_date - now
