@@ -81,12 +81,14 @@ def show_tasks(message):
             print(date)
             dates[date].append(value['task_name'] + ', assigned to ' + value['task_assignee'])
             
+        print(dates)
+            
         for date, tasks in dates.items():
             tasks_text = '\n'.join(f'- {task}' for task in tasks)
             text = f'Tasks for {date}:\n{tasks_text}'
             keyboard = types.InlineKeyboardMarkup()
             for task in tasks:
-                button = types.InlineKeyboardButton(text=f'❌ {task}', callback_data=f'FXdelete:{date}:{task}')
+                button = types.InlineKeyboardButton(text=f'❌', callback_data=f'delete:{date}:{task}')
                 keyboard.add(button)
             bot.send_message(message.chat.id, text, reply_markup=keyboard)
 
@@ -105,7 +107,7 @@ def delete_task(chat_id, c_date, task):
         
 
 # deletes the task and displays a message about the successful deletion of this task.
-@bot.callback_query_handler(func=lambda call: call.data.startswith('FXdelete:'))
+@bot.callback_query_handler(func=lambda call: call.data.startswith('delete:'))
 def delete_callback(call):
     _, date, task = call.data.split(':')
     delete_task(call.message.chat.id, date, task)
