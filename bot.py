@@ -91,7 +91,7 @@ def show_tasks(message):
     print(dates)
         
     for date, tasks in dates.items():
-        tasks_text = '\n'.join(f'- {task.task_name}' for task in tasks)
+        tasks_text = '\n'.join(f'- {task.task_name} assigned to {task.task_assignee}' for task in tasks)
         text = f'Tasks for {date}:\n{tasks_text}'
         keyboard = types.InlineKeyboardMarkup()
         for task in tasks:
