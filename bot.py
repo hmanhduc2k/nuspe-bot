@@ -101,6 +101,7 @@ def show_tasks(message):
 
 # task deletion function
 def delete_task(chat_id, c_date, task):
+    print(c_date)
     target = session.query(Tasks).filter_by(chat_id=str(chat_id), task_deadlines=c_date, task_name=task).first()
     if target:
         session.delete(target)
