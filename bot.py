@@ -103,7 +103,7 @@ def show_tasks(message):
 def delete_task(chat_id, c_date, task):
     with open('data/tasks.csv', 'a') as csvfile:
         csvwriter = csv.writer(csvfile)
-        csvwriter.writerow([uuid.uuid4(), chat_id, task, 'None', c_date, 'None', 'ongoing'])
+        csvwriter.writerow([chat_id, task, 'None', c_date, 'None'])
     # if todos.get(chat_id) is not None:
     #     if todos[chat_id].get(c_date) is not None:
     #         todos[chat_id][c_date].remove(task)

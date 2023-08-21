@@ -20,5 +20,6 @@ class Tasks:
         self.task_assignee = task_assignee
         self.task_deadlines = task_deadlines
         self.task_remarks = task_remarks
+        self.status = 'ongoing'
         
 Base.metadata.create_all(engine)
