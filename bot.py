@@ -115,7 +115,7 @@ def delete_callback(call):
     print(call.data.split('@@'))
     _, task, date = call.data.split('@@')
     delete_task(call.message.chat.id, date, task)
-    bot.answer_callback_query(call.id, text=f'Task "{task}" on {date} deleted. Please restart by typing /show_task again')
+    bot.answer_callback_query(call.id, text=f'Task "{task}" on {date} deleted. \nPlease restart by typing /show_task again')
 
 
 # the function of adding a new task
@@ -125,7 +125,7 @@ def add_task(message, chat_id, c_date):
         text = f'Task successfully registered on {c_date}'
         bot.send_message(chat_id=chat_id, text=text)
     except:
-        bot.send_message(chat_id=chat_id, text='Error occurred! Please format your plan this way: [task name]|[assignee]|[remarks], leave blank but keep the | if do not have')
+        bot.send_message(chat_id=chat_id, text='Error occurred! Please format your plan this way: \n[task name]|[assignee]|[remarks]\nLeave blank but keep the | if do not have')
 
 # the function adds a task to the todos dictionary
 def add_todo(chat_id, c_date, message):
