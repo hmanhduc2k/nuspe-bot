@@ -86,23 +86,23 @@ def show_tasks(message):
     for value in filtered:
         date = value.task_deadlines
         print(date)
-        dates[date].append(value.task_name + ', assigned to ' + value.task_assignee)
+        dates[date].append(value)
         
     print(dates)
         
     for date, tasks in dates.items():
-        tasks_text = '\n'.join(f'- {task}' for task in tasks)
+        tasks_text = '\n'.join(f'- {task.task_name}' for task in tasks)
         text = f'Tasks for {date}:\n{tasks_text}'
         keyboard = types.InlineKeyboardMarkup()
         for task in tasks:
-            button = types.InlineKeyboardButton(text=f'❌', callback_data=f'delete@@{date}@@{task}')
+            button = types.InlineKeyboardButton(text=f'❌', callback_data=f'delete@@{task.task_name}@@{task.task_deadlines}')
             keyboard.add(button)
         bot.send_message(message.chat.id, text, reply_markup=keyboard)
 
 # task deletion function
 def delete_task(chat_id, c_date, task):
     print(c_date)
-    target = session.query(Tasks).filter_by(chat_id=str(chat_id), task_deadlines=c_date.split(':')[0], task_name=task).first()
+    target = session.query(Tasks).filter_by(chat_id=str(chat_id), task_deadlines=c_date, task_name=task).first()
     if target:
         session.delete(target)
         session.commit()
