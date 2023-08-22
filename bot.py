@@ -123,13 +123,12 @@ def add_task(message, chat_id, c_date):
         bot.send_message(chat_id=chat_id, text=text)
         
         # Schedule the reminder to be sent every 10 minutes
-        schedule.every(10).minutes.do(send_reminder, chat_id=chat_id)
+        schedule.every(1).minutes.do(send_reminder, chat_id=chat_id)
     except:
         bot.send_message(chat_id=chat_id, text='Error occurred! Please format your plan this way: \n[task name]|[assignee]|[remarks]\nLeave blank but keep the | if do not have')
         
 def send_reminder(chat_id):
     bot.send_message(chat_id=chat_id, text="This is a recurring reminder!")
-
 
 # the function adds a task to the todos dictionary
 def add_todo(chat_id, c_date, message):
