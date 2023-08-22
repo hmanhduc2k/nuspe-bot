@@ -152,11 +152,12 @@ def send_reminder(chat_id):
         now = datetime.datetime.now()
         for task in target:
             time_diff = task.task_deadlines - now
-            if time_diff.days in [3, 2, 1] or (time_diff.days == 0 and time_diff.seconds in [12 * 3600, 6 * 3600, 3 * 3600]):
-                reminder_text = f"Reminder for {task.task_name}: Your task is approaching on {task.task_deadlines}!"
+            hours = time_diff.total_seconds() // 3600
+            if time_diff.days in [7, 3, 1, 0] and hours in [1, 6, 12, 18]:
+                reminder_text = f"Reminder for {task.task_name} assigned to {task.task_assignee}: Your task is approaching on {task.task_deadlines}, and now is {now}!"
                 bot.send_message(chat_id=chat_id, text=reminder_text)
         
-        time.sleep(60)  # Wait for 1 minute
+        time.sleep(600)  # Wait for 1 minute
 
 # Start a new thread for sending reminders
 def start_reminder_thread(chat_id):
