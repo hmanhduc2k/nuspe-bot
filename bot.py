@@ -34,7 +34,7 @@ def send_welcome(message):
     keyboard.add(button1)
     keyboard.add(button2)
     keyboard.add(button3)
-    chat_id = message.chat.id
+    start_reminder_thread(message.chat.id)
     bot.send_message(message.chat.id, 'Hello, ' + message.from_user.first_name + '! This is a NUSPE Manager bot!', reply_markup=keyboard)
 
 @bot.message_handler(commands=['help'])
@@ -123,14 +123,9 @@ def add_task(message, chat_id, c_date):
         text = f'Task successfully registered on {c_date}'
         bot.send_message(chat_id=chat_id, text=text)
         start_reminder_thread(chat_id)
-        # Schedule the reminder to be sent every 10 minutes
-        schedule.every(1).minutes.do(send_reminder, chat_id=chat_id)
     except:
         bot.send_message(chat_id=chat_id, text='Error occurred! Please format your plan this way: \n[task name]|[assignee]|[remarks]\nLeave blank but keep the | if do not have')
         
-def send_reminder(chat_id):
-    print('Printed statement')
-    bot.send_message(chat_id=chat_id, text="This is a recurring reminder!")
 
 # the function adds a task to the todos dictionary
 def add_todo(chat_id, c_date, message):
@@ -147,18 +142,27 @@ def add_todo(chat_id, c_date, message):
     session.add(obj)
     session.commit()
         
-        
 # Define the function to send a reminder message
 def send_reminder(chat_id):
+    '''
+    For all chat ids, retrieve all tasks available
+    '''
     while True:
-        bot.send_message(chat_id, text="This is a reminder!")
+        target = session.query(Tasks).filter_by(chat_id=str(chat_id)).all()
+        
+        now = datetime.datetime.now()
+        for task in target:
+            time_diff = task.task_deadlines - now
+            if time_diff.days in [3, 2, 1] or (time_diff.days == 0 and time_diff.seconds in [12 * 3600, 6 * 3600, 3 * 3600]):
+                reminder_text = f"Reminder for {task.task_name}: Your event is approaching!"
+                bot.send_message(chat_id=chat_id, text=reminder_text)
+        
         time.sleep(60)  # Wait for 1 minute
 
 # Start a new thread for sending reminders
 def start_reminder_thread(chat_id):
     reminder_thread = threading.Thread(target=send_reminder, args=(chat_id, ))
     reminder_thread.start()
-    
 
 bot.polling(none_stop=True)
 
