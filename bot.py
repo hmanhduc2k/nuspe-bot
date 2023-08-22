@@ -155,7 +155,12 @@ def send_reminders():
 # Schedule reminders to be sent every day at a specific time
 schedule.every(1).minutes.do(send_reminders)
 
-bot.polling(none_stop=True)
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+# Start the bot and the reminder scheduler
+def main():
+    bot.start_polling()
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+if __name__ == '__main__':
+    main()
