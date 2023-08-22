@@ -5,6 +5,7 @@ import telebot_calendar
 import datetime
 from datetime import timedelta
 import schedule
+import sched
 import time
 import os
 import csv
@@ -23,6 +24,8 @@ now = datetime.datetime.now()
 
 todos = {}
 
+chat_id = 0
+
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     keyboard = types.ReplyKeyboardMarkup(True)
@@ -32,6 +35,7 @@ def send_welcome(message):
     keyboard.add(button1)
     keyboard.add(button2)
     keyboard.add(button3)
+    chat_id = message.chat.id
     bot.send_message(message.chat.id, 'Hello, ' + message.from_user.first_name + '! This is a NUSPE Manager bot!', reply_markup=keyboard)
 
 @bot.message_handler(commands=['help'])
@@ -142,25 +146,39 @@ def add_todo(chat_id, c_date, message):
     session.add(obj)
     session.commit()
         
-def send_reminders():
-    print('reached further')
-    now = datetime.now()
-    reminder_range = timedelta(minutes=1)
+        
+scheduler = sched.scheduler(time.time, time.sleep)
+
+
+def send_notification(chat_id):
+    bot.send_message(chat_id=chat_id, text=f"This is a recurring notification!")
+
+scheduler = sched.scheduler(time.time, time.sleep)
+
+def schedule_recurring_message():
+    scheduler.enter(60, 1, schedule_recurring_message)  # 600 seconds = 10 minutes
+    send_notification(chat_id)
+
+# Schedule the first recurring message
+scheduler.enter(0, 1, schedule_recurring_message)
+
+# Start the scheduler
+scheduler.run()
+# def send_reminders():
+#     print('reached further')
+#     now = datetime.now()
+#     reminder_range = timedelta(minutes=1)
     
-    tasks = session.query(Tasks).all()
-    for task in tasks:
-        print('reached')
-        bot.send_message(task.chat_id, f"Reminder: Your task is in 1 minutes time!")
+#     tasks = session.query(Tasks).all()
+#     for task in tasks:
+#         print('reached')
+#         bot.send_message(task.chat_id, f"Reminder: Your task is in 1 minutes time!")
 
-# Schedule reminders to be sent every day at a specific time
-schedule.every(1).minutes.do(send_reminders)
+# # Schedule reminders to be sent every day at a specific time
+# schedule.every(1).minutes.do(send_reminders)
 
-# Start the bot and the reminder scheduler
-def main():
-    bot.polling(none_stop=True)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+bot.polling(none_stop=True)
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
 
-if __name__ == '__main__':
-    main()
