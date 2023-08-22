@@ -157,7 +157,7 @@ schedule.every(1).minutes.do(send_reminders)
 
 # Start the bot and the reminder scheduler
 def main():
-    bot.start_polling()
+    bot.polling(none_stop=True)
     while True:
         schedule.run_pending()
         time.sleep(1)
