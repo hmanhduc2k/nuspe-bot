@@ -22,8 +22,6 @@ calendar = Calendar(language=ENGLISH_LANGUAGE)
 calendar_1 = CallbackData('calendar_1', 'action', 'year', 'month', 'day')
 now = datetime.datetime.now()
 
-todos = {}
-
 chat_id = 0
 
 @bot.message_handler(commands=['start'])
@@ -77,11 +75,6 @@ def callback_inline(call: types.CallbackQuery):
 def show_tasks(message):
     filtered = session.query(Tasks).filter_by(chat_id=str(message.chat.id), status='ongoing').all()
     print('Show tasks called', message.chat.id)
-    # with open('data/tasks.csv', 'r') as csvfile:
-    #     csvreader = csv.DictReader(csvfile)
-    #     for row in csvreader:
-    #         if row['chat_id'] == str(message.chat.id) and row['status'] == 'ongoing':
-    #             filtered.append(row)
                 
     if filtered == []:
         bot.send_message(message.chat.id, 'No task is available now')
@@ -128,8 +121,15 @@ def add_task(message, chat_id, c_date):
         add_todo(chat_id, c_date, message)
         text = f'Task successfully registered on {c_date}'
         bot.send_message(chat_id=chat_id, text=text)
+        
+        # Schedule the reminder to be sent every 10 minutes
+        schedule.every(10).minutes.do(send_reminder, chat_id=chat_id)
     except:
         bot.send_message(chat_id=chat_id, text='Error occurred! Please format your plan this way: \n[task name]|[assignee]|[remarks]\nLeave blank but keep the | if do not have')
+        
+def send_reminder(chat_id):
+    bot.send_message(chat_id=chat_id, text="This is a recurring reminder!")
+
 
 # the function adds a task to the todos dictionary
 def add_todo(chat_id, c_date, message):
@@ -147,3 +147,8 @@ def add_todo(chat_id, c_date, message):
     session.commit()
         
 bot.polling(none_stop=True)
+
+# Start the scheduler loop
+while True:
+    schedule.run_pending()
+    time.sleep(1)
