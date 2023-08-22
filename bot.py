@@ -8,6 +8,7 @@ import schedule
 import sched
 import time
 import os
+import threading
 import csv
 import uuid
 from collections import defaultdict
@@ -121,7 +122,7 @@ def add_task(message, chat_id, c_date):
         add_todo(chat_id, c_date, message)
         text = f'Task successfully registered on {c_date}'
         bot.send_message(chat_id=chat_id, text=text)
-        
+        start_reminder_thread(chat_id)
         # Schedule the reminder to be sent every 10 minutes
         schedule.every(1).minutes.do(send_reminder, chat_id=chat_id)
     except:
@@ -146,9 +147,18 @@ def add_todo(chat_id, c_date, message):
     session.add(obj)
     session.commit()
         
+        
+# Define the function to send a reminder message
+def send_reminder(chat_id):
+    while True:
+        bot.send_message(chat_id, text="This is a reminder!")
+        time.sleep(60)  # Wait for 1 minute
+
+# Start a new thread for sending reminders
+def start_reminder_thread(chat_id):
+    reminder_thread = threading.Thread(target=send_reminder, args=(chat_id, ))
+    reminder_thread.start()
+    
+
 bot.polling(none_stop=True)
 
-while True:
-    print('reached')
-    schedule.run_pending()
-    time.sleep(1)
