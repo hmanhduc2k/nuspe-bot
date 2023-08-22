@@ -148,7 +148,7 @@ def add_todo(chat_id, c_date, message):
         
 bot.polling(none_stop=True)
 
-# Start the scheduler loop
 while True:
+    print('reached')
     schedule.run_pending()
     time.sleep(1)
