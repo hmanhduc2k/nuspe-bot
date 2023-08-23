@@ -102,7 +102,7 @@ def show_tasks(message):
 @bot.callback_query_handler(func=lambda call: call.data.startswith('select@@'))
 def view_task(call):
     task_id = call.data.split('@@')[1]
-    keyboard = types.InlineKeyboardMarkup()
+    keyboard = types.InlineKeyboardMarkup(row_width=2)
     task = session.query(Tasks).filter_by(task_id=task_id).one_or_none()
     if task:
         view_button = types.InlineKeyboardButton(text=f'Edit task', callback_data=f'edit@@')
