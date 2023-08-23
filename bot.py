@@ -92,11 +92,26 @@ def show_tasks(message):
     for date, tasks in dates.items():
         tasks_text = '\n'.join(f'- {task.task_name} assigned to {task.task_assignee}' for task in tasks)
         text = f'Tasks for {date}:'
-        keyboard = types.InlineKeyboardMarkup()
+        keyboard = types.InlineKeyboardMarkup(row_width=1)
         for task in tasks:
-            button = types.InlineKeyboardButton(text=f'❌{task.task_name}', callback_data=f'delete@@{task.task_name}@@{task.task_deadlines}')
+            # button = types.InlineKeyboardButton(text=f'View: {task.task_name}', callback_data=f'delete@@{task.task_name}@@{task.task_deadlines}')
+            button = types.KeyboardButton(text=f'View: {task.task_name}', callback_data=f"select@@{task.task_id}")
             keyboard.add(button)
         bot.send_message(message.chat.id, text, reply_markup=keyboard)
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('select@@'))
+def view_task(call):
+    task_id = call.data.split('@@')[1]
+    keyboard = types.InlineKeyboardMarkup(row_width=2)
+    task = session.query(Tasks).filter_by(task_id=task_id).one_or_none()
+    if task:
+        view_button = types.InlineKeyboardButton(text=f'Edit task')
+        delete_button = types.InlineKeyboardButton(text=f'Delete task')
+        cancel_button = types.InlineKeyboardButton(text=f'Cancel')
+        keyboard.add(view_button)
+        keyboard.add(delete_button)
+        keyboard.add(cancel_button)
+        bot.send_message(call.message.chat.id, f'View {task.task_name}', reply_markup=keyboard)
 
 # task deletion function
 def delete_task(chat_id, c_date, task):
@@ -111,10 +126,11 @@ def delete_task(chat_id, c_date, task):
 # deletes the task and displays a message about the successful deletion of this task.
 @bot.callback_query_handler(func=lambda call: call.data.startswith('delete@@'))
 def delete_callback(call):
-    print(call.data.split('@@'))
-    _, task, date = call.data.split('@@')
-    delete_task(call.message.chat.id, date, task)
-    bot.answer_callback_query(call.id, text=f'Task "{task}" on {date} deleted. \nPlease restart by typing /show_task again')
+    pass
+    # print(call.data.split('@@'))
+    # _, task, date = call.data.split('@@')
+    # delete_task(call.message.chat.id, date, task)
+    # bot.answer_callback_query(call.id, text=f'Task "{task}" on {date} deleted. \nPlease restart by typing /show_task again')
 
 
 # the function of adding a new task
