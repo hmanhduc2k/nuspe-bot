@@ -91,10 +91,10 @@ def show_tasks(message):
         
     for date, tasks in dates.items():
         tasks_text = '\n'.join(f'- {task.task_name} assigned to {task.task_assignee}' for task in tasks)
-        text = f'Tasks for {date}:\n{tasks_text}'
+        text = f'Tasks for {date}:'
         keyboard = types.InlineKeyboardMarkup()
         for task in tasks:
-            button = types.InlineKeyboardButton(text=f'❌', callback_data=f'delete@@{task.task_name}@@{task.task_deadlines}')
+            button = types.InlineKeyboardButton(text=f'❌{task.task_name}', callback_data=f'delete@@{task.task_name}@@{task.task_deadlines}')
             keyboard.add(button)
         bot.send_message(message.chat.id, text, reply_markup=keyboard)
 
