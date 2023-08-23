@@ -76,7 +76,7 @@ def callback_inline(call: types.CallbackQuery):
 @bot.message_handler(commands=['show_task'])
 def show_tasks(message):
     print(message)
-    print(message.split(' '))
+    print(message.text.split(' '))
     filtered = session.query(Tasks).filter_by(chat_id=str(message.chat.id), status='ongoing').all()
     print('Show tasks called', message.chat.id)
                 
