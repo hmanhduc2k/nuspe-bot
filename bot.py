@@ -14,6 +14,7 @@ import uuid
 from collections import defaultdict
 from models import Tasks
 from models import Session
+from sqlalchemy import cast, Date
 
 session = Session()
 
@@ -25,7 +26,7 @@ now = datetime.datetime.now()
 
 chat_id = 0
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=['start', 'refresh'])
 def send_welcome(message):
     keyboard = types.ReplyKeyboardMarkup(True)
     button1 = types.KeyboardButton('/add_task')
@@ -147,17 +148,18 @@ def send_reminder(chat_id):
     For all chat ids, retrieve all tasks available
     '''
     while True:
+        print('System is run again')
         target = session.query(Tasks).filter_by(chat_id=str(chat_id)).all()
         
         now = datetime.datetime.now()
         for task in target:
             time_diff = task.task_deadlines - now
             hours = time_diff.total_seconds() // 3600
-            if hours in [1, 3, 6, 12, 24, 48, 72, 24 * 7]:
-                reminder_text = f"Reminder for {task.task_name} assigned to {task.task_assignee}: Your task is approaching on {task.task_deadlines}, and now is {now}!"
+            if hours in [1, 6, 12, 24, 48, 72, 24 * 7]:
+                reminder_text = f"Reminder for {task.task_name} assigned to {task.task_assignee}: \nYour task is approaching on {cast(task.task_deadlines, Date)}, and now is {now.date()}!"
                 bot.send_message(chat_id=chat_id, text=reminder_text)
         
-        time.sleep(600)  # Wait for 1 minute
+        time.sleep(3600)  # Wait for 1 hour
 
 # Start a new thread for sending reminders
 def start_reminder_thread(chat_id):
