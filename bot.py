@@ -95,7 +95,7 @@ def show_tasks(message):
         keyboard = types.InlineKeyboardMarkup(row_width=1)
         for task in tasks:
             # button = types.InlineKeyboardButton(text=f'View: {task.task_name}', callback_data=f'delete@@{task.task_name}@@{task.task_deadlines}')
-            button = types.KeyboardButton(text=f'View: {task.task_name}', callback_data=f"select@@{task.task_id}")
+            button = types.InlineKeyboardButton(text=f'View: {task.task_name}', callback_data=f"select@@{task.task_id}")
             keyboard.add(button)
         bot.send_message(message.chat.id, text, reply_markup=keyboard)
 
