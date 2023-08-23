@@ -102,15 +102,17 @@ def show_tasks(message):
 @bot.callback_query_handler(func=lambda call: call.data.startswith('select@@'))
 def view_task(call):
     task_id = call.data.split('@@')[1]
-    keyboard = types.InlineKeyboardMarkup(row_width=2)
     task = session.query(Tasks).filter_by(task_id=task_id).one_or_none()
     if task:
         view_button = types.InlineKeyboardButton(text=f'Edit task', callback_data=f'edit@@')
         delete_button = types.InlineKeyboardButton(text=f'Delete task', callback_data=f'delete@@')
         cancel_button = types.InlineKeyboardButton(text=f'Cancel', callback_data='cancel')
-        keyboard.add(view_button)
-        keyboard.add(delete_button)
-        keyboard.add(cancel_button)
+        
+        keyboard = types.InlineKeyboardMarkup(
+            [
+                [view_button, delete_button], [cancel_button]
+            ]
+        )
         bot.send_message(call.message.chat.id, f'View {task.task_name}', reply_markup=keyboard)
 
 # task deletion function
