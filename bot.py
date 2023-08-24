@@ -88,7 +88,7 @@ def callback_1(call: types.CallbackQuery):
     name, action, year, month, day = call.data.split(calendar_1.sep)
     date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
     if action == 'DAY':
-        bot.send_message(chat_id=call.message.chat.id, 'Clicked')
+        bot.send_message(chat_id=call.message.chat.id, text='Clicked');
         # bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text='Clicked')
         # bot.edit_message_reply_markup(chat_id=call.message.chat.id, message_id=call.message.id, text='Clicked')
 
