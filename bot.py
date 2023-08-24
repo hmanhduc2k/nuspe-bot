@@ -101,7 +101,7 @@ def callback_1(call: types.CallbackQuery):
 @bot.callback_query_handler(func=lambda call: call.data.startswith(calendar_3.prefix))
 def callback_2(call: types.CallbackQuery):
     print(call.message.text)
-    start_date = call.message.text.split('.')[0].split(': ')[1]
+    start_date = call.message.text.split('. ')[0].split(': ')[1]
     name, action, year, month, day = call.data.split(calendar_1.sep)
     date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
     if action == 'DAY':
