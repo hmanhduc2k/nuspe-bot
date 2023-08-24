@@ -104,6 +104,7 @@ def callback_2(call: types.CallbackQuery):
     name, action, year, month, day = call.data.split(calendar_1.sep)
     date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
     if action == 'DAY':
+        print(start_date)
         start_date = datetime.datetime.strptime(start_date, "%d.%m.%Y")
         end_date = datetime.datetime.strftime("%d.%m.%Y")
         bot.send_message(
