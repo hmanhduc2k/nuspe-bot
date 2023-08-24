@@ -247,6 +247,5 @@ def start_reminder_thread(chat_id):
     reminder_thread = threading.Thread(target=send_reminder, args=(chat_id, ))
     reminder_thread.start()
 
-start_reminder_thread()
 bot.polling(none_stop=True)
 
