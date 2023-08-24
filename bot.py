@@ -14,7 +14,7 @@ import uuid
 from collections import defaultdict
 from models import Tasks
 from models import Session
-from sqlalchemy import cast, Date
+from sqlalchemy import cast, Date, extract
 from sqlalchemy.sql.expression import and_, or_
 
 session = Session()
@@ -115,7 +115,7 @@ def callback_2(call: types.CallbackQuery):
         filtered = session.query(Tasks).filter(
                 and_(Tasks.chat_id == str(call.message.chat.id), Tasks.status =='ongoing')
             ).filter(
-                and_(Tasks.task_deadlines - start_date >= 0, Tasks.task_deadlines - end_date <= 0)
+                and_(extract('day', Tasks.task_deadlines - start_date) >= 0, extract('day', Tasks.task_deadlines - end_date) <= 0)
             ).all()
                     
         if filtered == []:
