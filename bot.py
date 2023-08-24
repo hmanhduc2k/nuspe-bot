@@ -105,15 +105,15 @@ def callback_2(call: types.CallbackQuery):
     name, action, year, month, day = call.data.split(calendar_1.sep)
     date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
     if action == 'DAY':
-        start_date = datetime.datetime.strptime(start_date, "%d.%m.%Y")
-        end_date = date.strftime("%d.%m.%Y")
+        start_date = datetime.datetime.strptime(start_date, "%d.%m.%Y").date()
+        end_date = date.strftime("%d.%m.%Y").date()
         bot.send_message(
             call.message.chat.id, f'Show events starting from: {start_date} to {end_date}', 
         )
         filtered = session.query(Tasks).filter(
                 and_(Tasks.chat_id == str(call.message.chat.id), Tasks.status =='ongoing')
             ).filter(
-                and_(Tasks.task_deadlines - start_date >= 0, Tasks.task_deadlines - end_date <= 0)
+                and_(Tasks.task_deadlines - date(start_date) >= 0, Tasks.task_deadlines - end_date <= 0)
             ).all()
                     
         if filtered == []:
