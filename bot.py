@@ -107,6 +107,7 @@ def callback_2(call: types.CallbackQuery):
     if action == 'DAY':
         start_date = datetime.datetime.strptime(start_date, "%d.%m.%Y").date()
         end_date = date.strftime("%d.%m.%Y")
+        end_date = datetime.datetime.strptime(end_date, "%d.%m.%Y").date()
         bot.send_message(
             call.message.chat.id, f'Show events starting from: {start_date} to {end_date}', 
         )
