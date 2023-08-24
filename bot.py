@@ -104,13 +104,13 @@ def callback_2(call: types.CallbackQuery):
     start_date = call.message.text.split('. ')[0].split(': ')[1]
     name, action, year, month, day = call.data.split(calendar_1.sep)
     date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
-    print(date, type(date))
     if action == 'DAY':
         start_date = datetime.datetime.strptime(start_date, "%d.%m.%Y").date()
-        end_date = date.strftime("%d.%m.%Y").date()
+        end_date = date.strptime(date, "%d.%m.%Y").date()
         bot.send_message(
             call.message.chat.id, f'Show events starting from: {start_date} to {end_date}', 
         )
+        print(start_date, type(start_date), end_date, type(end_date))
         filtered = session.query(Tasks).filter(
                 and_(Tasks.chat_id == str(call.message.chat.id), Tasks.status =='ongoing')
             ).filter(
