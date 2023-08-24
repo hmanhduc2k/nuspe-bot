@@ -15,6 +15,7 @@ from collections import defaultdict
 from models import Tasks
 from models import Session
 from sqlalchemy import cast, Date
+from sqlalchemy.sql.expression import and_, or_
 
 session = Session()
 
@@ -32,11 +33,7 @@ chat_id = 0
 @bot.message_handler(commands=['start', 'refresh'])
 def send_welcome(message):
     keyboard = types.ReplyKeyboardMarkup(True)
-    # button1 = types.KeyboardButton('/add_task')
-    # button2 = types.KeyboardButton('/show_task')
     button3 = types.KeyboardButton('/help')
-    # keyboard.add(button1)
-    # keyboard.add(button2)
     keyboard.add(button3)
     start_reminder_thread(message.chat.id)
     bot.send_message(message.chat.id, 'Hello, ' + message.from_user.first_name + '! This is a NUSPE Manager bot!', reply_markup=keyboard)
@@ -92,7 +89,7 @@ def callback_1(call: types.CallbackQuery):
     if action == 'DAY':
         c_date = date.strftime("%d.%m.%Y")
         bot.send_message(
-            call.message.chat.id, f'Show events starting from: {c_date}', 
+            call.message.chat.id, f'Show events starting from: {c_date}. Select an end date:', 
             reply_markup=calendar.create_calendar(
                 name=calendar_3.prefix,
                 year=now.year,
@@ -103,14 +100,37 @@ def callback_1(call: types.CallbackQuery):
         
 @bot.callback_query_handler(func=lambda call: call.data.startswith(calendar_3.prefix))
 def callback_2(call: types.CallbackQuery):
-    start_date = call.message.text.split(': ')[1]
+    start_date = call.message.text.split('.')[0].split(': ')[1]
     name, action, year, month, day = call.data.split(calendar_1.sep)
     date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
     if action == 'DAY':
-        end_date = date.strftime("%d.%m.%Y")
+        start_date = datetime.datetime.strptime(start_date, "%d.%m.%Y")
+        end_date = datetime.datetime.strftime("%d.%m.%Y")
         bot.send_message(
             call.message.chat.id, f'Show events starting from: {start_date} to {end_date}', 
         )
+        filtered = session.query(Tasks).filter_by(
+                chat_id=str(call.message.chat.id), status='ongoing'
+            ).filter_by(
+                and_(Tasks.task_deadlines >= start_date, Tasks.task_deadlines <= end_date)
+            ).all()
+                    
+        if filtered == []:
+            bot.send_message(call.message.chat.id, 'No task is available now')
+
+        dates = defaultdict(list)
+        for value in filtered:
+            date = value.task_deadlines
+            dates[date].append(value)
+            
+        for date, tasks in dates.items():
+            text = f'Tasks for {date}:'
+            keyboard = types.InlineKeyboardMarkup(row_width=1)
+            for task in tasks:
+                button = types.InlineKeyboardButton(text=f'View: {task.task_name}', callback_data=f"select@@{task.task_id}")
+                keyboard.add(button)
+            bot.send_message(call.message.chat.id, text, reply_markup=keyboard)
+        
 
 @bot.message_handler(commands=['show_task'])
 def show_tasks(message):
@@ -168,11 +188,10 @@ def delete_task(chat_id, c_date, task):
 # deletes the task and displays a message about the successful deletion of this task.
 @bot.callback_query_handler(func=lambda call: call.data.startswith('delete@@'))
 def delete_callback(call):
-    pass
-    # print(call.data.split('@@'))
-    # _, task, date = call.data.split('@@')
-    # delete_task(call.message.chat.id, date, task)
-    # bot.answer_callback_query(call.id, text=f'Task "{task}" on {date} deleted. \nPlease restart by typing /show_task again')
+    print(call.data.split('@@'))
+    _, task, date = call.data.split('@@')
+    delete_task(call.message.chat.id, date, task)
+    bot.answer_callback_query(call.id, text=f'Task "{task}" on {date} deleted. \nPlease restart by typing /show_task again')
 
 
 # the function of adding a new task
