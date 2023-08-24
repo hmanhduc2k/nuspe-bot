@@ -76,12 +76,19 @@ def callback_inline(call: types.CallbackQuery):
         
 @bot.message_handler(commands=['showing'])
 def test_show_task(message):
-    bot.send_message(message.chat.id, 'Which date do you want to add a task to?', 
+    bot.send_message(message.chat.id, 'Select start date', 
             reply_markup=calendar.create_calendar(
                 name=calendar_2.prefix,
                 year=now.year,
                 month=now.month)
             )
+    
+@bot.callback_query_handler(func=lambda call: call.data.startswith(calendar_2.prefix))
+def callback_1(call: types.CallbackQuery):
+    name, action, year, month, day = call.data.split(calendar_1.sep)
+    date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
+    if action == 'DAY':
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text='Clicked')
 
 @bot.message_handler(commands=['show_task'])
 def show_tasks(message):
