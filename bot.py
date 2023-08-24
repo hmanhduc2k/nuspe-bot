@@ -112,7 +112,7 @@ def callback_2(call: types.CallbackQuery):
             call.message.chat.id, f'Show events starting from: {start_date} to {end_date}', 
         )
         filtered = session.query(Tasks).filter_by(
-                chat_id=str(call.message.chat.id), status='ongoing'
+                and_(Tasks.chat_id == str(call.message.chat.id), Tasks.status =='ongoing')
             ).filter_by(
                 and_(Tasks.task_deadlines - start_date >= 0, Tasks.task_deadlines - end_date <= 0)
             ).all()
