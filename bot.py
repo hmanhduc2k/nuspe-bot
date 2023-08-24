@@ -23,6 +23,8 @@ bot = telebot.TeleBot(TOKEN)
 calendar = Calendar(language=ENGLISH_LANGUAGE)
 calendar_1 = CallbackData('calendar_1', 'action', 'year', 'month', 'day')
 calendar_2 = CallbackData('calendar_2', 'action', 'year', 'month', 'day')
+calendar_3 = CallbackData('calendar_3', 'action', 'year', 'month', 'day')
+
 now = datetime.datetime.now()
 
 chat_id = 0
@@ -89,16 +91,26 @@ def callback_1(call: types.CallbackQuery):
     date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
     if action == 'DAY':
         c_date = date.strftime("%d.%m.%Y")
-        bot.send_message(chat_id=call.message.chat.id, text=f'starts from {c_date}');
         bot.send_message(
-            call.message.chat.id, 'Select end date', 
+            call.message.chat.id, f'Show events starting from: {c_date}', 
             reply_markup=calendar.create_calendar(
-                name=calendar_2.prefix,
+                name=calendar_3.prefix,
                 year=now.year,
                 month=now.month)
         )
         # bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text='Clicked')
         # bot.edit_message_reply_markup(chat_id=call.message.chat.id, message_id=call.message.id, text='Clicked')
+        
+@bot.callback_query_handler(func=lambda call: call.data.startswith(calendar_3.prefix))
+def callback_2(call: types.CallbackQuery):
+    start_date = call.message.text.split(': ')[1]
+    name, action, year, month, day = call.data.split(calendar_1.sep)
+    date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
+    if action == 'DAY':
+        end_date = date.strftime("%d.%m.%Y")
+        bot.send_message(
+            call.message.chat.id, f'Show events starting from: {start_date} to {end_date}', 
+        )
 
 @bot.message_handler(commands=['show_task'])
 def show_tasks(message):
