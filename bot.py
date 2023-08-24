@@ -125,7 +125,7 @@ def callback_2(call: types.CallbackQuery):
             print(date)
             dates[date].append(value)
             
-        keyboard = types.InlineKeyboardMarkup(row_width=1)
+        keyboard = types.InlineKeyboardMarkup(row_width=2)
         for date, tasks in dates.items():
             for task in tasks:
                 temp = task.task_deadlines.date()
