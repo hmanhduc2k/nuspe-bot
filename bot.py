@@ -108,18 +108,16 @@ def callback_2(call: types.CallbackQuery):
         start_date = datetime.datetime.strptime(start_date, "%d.%m.%Y")
         end_date = date.strftime("%d.%m.%Y")
         end_date = datetime.datetime.strptime(end_date, "%d.%m.%Y")
-        bot.send_message(
-            call.message.chat.id, f'Show events starting from: {start_date} to {end_date}', 
-        )
-        print(start_date, type(start_date), end_date, type(end_date))
         filtered = session.query(Tasks).filter(
                 and_(Tasks.chat_id == str(call.message.chat.id), Tasks.status =='ongoing')
             ).filter(
                 and_(extract('day', Tasks.task_deadlines - start_date) >= 0, extract('day', Tasks.task_deadlines - end_date) <= 0)
             ).all()
-                    
         if filtered == []:
             bot.send_message(call.message.chat.id, 'No task is available now')
+        bot.send_message(
+            call.message.chat.id, f'Show events starting from: {start_date.date()} to {end_date.date()}', 
+        )
 
         dates = defaultdict(list)
         for value in filtered:
@@ -128,12 +126,12 @@ def callback_2(call: types.CallbackQuery):
             dates[date].append(value)
             
         for date, tasks in dates.items():
-            text = f'Tasks for {date}:'
             keyboard = types.InlineKeyboardMarkup(row_width=1)
             for task in tasks:
-                button = types.InlineKeyboardButton(text=f'View: {task.task_name}', callback_data=f"select@@{task.task_id}")
+                temp = task.task_deadlines.date()
+                button = types.InlineKeyboardButton(text=f'Deadline on {temp}: {task.task_name}', callback_data=f"select@@{task.task_id}")
                 keyboard.add(button)
-            bot.send_message(call.message.chat.id, text, reply_markup=keyboard)
+        bot.send_message(call.message.chat.id, 'List', reply_markup=keyboard)
         
 
 @bot.message_handler(commands=['show_task'])
