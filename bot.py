@@ -22,6 +22,7 @@ TOKEN = '6177637545:AAH-qY4PytR-CGyCrG_OvpTrckaHpZ5Kv68'
 bot = telebot.TeleBot(TOKEN)
 calendar = Calendar(language=ENGLISH_LANGUAGE)
 calendar_1 = CallbackData('calendar_1', 'action', 'year', 'month', 'day')
+calendar_2 = CallbackData('calendar_2', 'action', 'year', 'month', 'day')
 now = datetime.datetime.now()
 
 chat_id = 0
@@ -29,11 +30,11 @@ chat_id = 0
 @bot.message_handler(commands=['start', 'refresh'])
 def send_welcome(message):
     keyboard = types.ReplyKeyboardMarkup(True)
-    button1 = types.KeyboardButton('/add_task')
-    button2 = types.KeyboardButton('/show_task')
+    # button1 = types.KeyboardButton('/add_task')
+    # button2 = types.KeyboardButton('/show_task')
     button3 = types.KeyboardButton('/help')
-    keyboard.add(button1)
-    keyboard.add(button2)
+    # keyboard.add(button1)
+    # keyboard.add(button2)
     keyboard.add(button3)
     start_reminder_thread(message.chat.id)
     bot.send_message(message.chat.id, 'Hello, ' + message.from_user.first_name + '! This is a NUSPE Manager bot!', reply_markup=keyboard)
@@ -72,7 +73,16 @@ def callback_inline(call: types.CallbackQuery):
         bot.register_next_step_handler(msg, lambda message: add_task(message, chat_id=call.message.chat.id, c_date=c_date))
     elif action == 'CANCEL':
         bot.send_message(chat_id=call.message.chat.id, text='🚫 Cancelled')
-    
+        
+@bot.message_handler(commands=['showing'])
+def test_show_task(message):
+    bot.send_message(message.chat.id, 'Which date do you want to add a task to?', 
+            reply_markup=calendar.create_calendar(
+                name=calendar_2.prefix,
+                year=now.year,
+                month=now.month)
+            )
+
 @bot.message_handler(commands=['show_task'])
 def show_tasks(message):
     print(message)
