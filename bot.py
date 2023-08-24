@@ -123,6 +123,7 @@ def callback_2(call: types.CallbackQuery):
         dates = defaultdict(list)
         for value in filtered:
             date = value.task_deadlines
+            print(date)
             dates[date].append(value)
             
         for date, tasks in dates.items():
