@@ -174,7 +174,7 @@ def view_task(call):
         bot.send_message(call.message.chat.id, f'View {task.task_name}', reply_markup=keyboard)
         
         
-@bot.callback.query_handler(func=lambda call: call.data.startswith('edit@@'))
+@bot.callback_query_handler(func=lambda call: call.data.startswith('edit@@'))
 def edit_task(call):
     task_id = call.data.split('@@')[1]
     edit_name = types.InlineKeyboardButton(text=f'Edit task', callback_data=f'editname@@{task_id}')
