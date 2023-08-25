@@ -32,13 +32,7 @@ now = datetime.datetime.now()
 
 reminder_started = False
 
-@bot.message_handler(commands=['start', 'refresh'])
-def send_welcome(message):
-    keyboard = types.ReplyKeyboardMarkup(True)
-    button3 = types.KeyboardButton('/help')
-    keyboard.add(button3)
-    start_reminder_thread(message.chat.id)
-    bot.send_message(message.chat.id, 'Hello, ' + message.from_user.first_name + '! This is a NUSPE Manager bot!', reply_markup=keyboard)
+
 
 @bot.message_handler(commands=['help'])
 def send_hello(message):
@@ -55,10 +49,6 @@ def add_tasks(message):
             )
 
 add_task_module.attach(bot)
-
-@bot.message_handler(commands=['fuck_you'])
-def reply_to_fu(message):
-    bot.reply_to(message, 'Do not worry brother, NUSPE will never leave you or fk you alone <3')
 
         
 @bot.message_handler(commands=['showing'])
