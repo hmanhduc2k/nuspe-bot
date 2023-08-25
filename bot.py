@@ -17,7 +17,7 @@ from models import Session
 from sqlalchemy import cast, Date, extract
 from sqlalchemy.sql.expression import and_, or_
 
-from commands import add_task_module
+from commands import add_task_module, start_module
 
 session = Session()
 
@@ -49,7 +49,7 @@ def add_tasks(message):
             )
 
 add_task_module.attach(bot)
-
+start_module.attach(bot)
         
 @bot.message_handler(commands=['showing'])
 def test_show_task(message):
