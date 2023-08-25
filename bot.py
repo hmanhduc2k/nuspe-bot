@@ -17,7 +17,7 @@ from models import Session
 from sqlalchemy import cast, Date, extract
 from sqlalchemy.sql.expression import and_, or_
 
-from commands import add_task_module, start_module
+from commands import add_task_module, start_module, help_module
 
 session = Session()
 
@@ -32,12 +32,6 @@ now = datetime.datetime.now()
 
 reminder_started = False
 
-
-
-@bot.message_handler(commands=['help'])
-def send_hello(message):
-    bot.reply_to(message, "Please add in a task, the deadlines, and who you assign the task to!")
-    
 @bot.message_handler(commands=['add_task'])
 def add_tasks(message):
     # return add_task_module(message, bot)
@@ -50,6 +44,7 @@ def add_tasks(message):
 
 add_task_module.attach(bot)
 start_module.attach(bot)
+help_module.attach(bot)
         
 @bot.message_handler(commands=['showing'])
 def test_show_task(message):
