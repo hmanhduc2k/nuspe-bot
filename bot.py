@@ -185,7 +185,7 @@ def edit_task(call):
                 [edit_name, edit_assignee, edit_remarks]
             ]
         )
-    bot.send_mesage(call.message.chat.id, 'Select a field you want to edit', reply_markup=keyboard)
+    bot.send_message(call.message.chat.id, 'Select a field you want to edit', reply_markup=keyboard)
 
 # task deletion function
 def delete_task(chat_id, c_date, task):
