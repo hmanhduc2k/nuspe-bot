@@ -17,6 +17,8 @@ from models import Session
 from sqlalchemy import cast, Date, extract
 from sqlalchemy.sql.expression import and_, or_
 
+from commands import add_task_module
+
 session = Session()
 
 TOKEN = '6177637545:AAH-qY4PytR-CGyCrG_OvpTrckaHpZ5Kv68'
@@ -51,23 +53,13 @@ def add_tasks(message):
                 year=now.year,
                 month=now.month)
             )
-    
+
+add_task_module.attach(bot)
+
 @bot.message_handler(commands=['fuck_you'])
 def reply_to_fu(message):
     bot.reply_to(message, 'Do not worry brother, NUSPE will never leave you or fk you alone <3')
-    
 
-# the function is a callback request handler. It is called when you click on the calendar buttons
-@bot.callback_query_handler(func=lambda call: call.data.startswith(calendar_1.prefix))
-def callback_inline(call: types.CallbackQuery):
-    name, action, year, month, day = call.data.split(calendar_1.sep)
-    date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
-    if action == 'DAY':
-        c_date = date.strftime("%d.%m.%Y")
-        msg = bot.send_message(chat_id=call.message.chat.id, text=f'You chose {c_date}, please enter your plan.\nFormat your plan this way: task_name|assignee|remarks: ')
-        bot.register_next_step_handler(msg, lambda message: add_task(message, chat_id=call.message.chat.id, c_date=c_date))
-    elif action == 'CANCEL':
-        bot.send_message(chat_id=call.message.chat.id, text='🚫 Cancelled')
         
 @bot.message_handler(commands=['showing'])
 def test_show_task(message):
@@ -206,8 +198,23 @@ def delete_callback(call):
     bot.answer_callback_query(call.id, text=f'Task "{task}" on {date} deleted. \nPlease restart by typing /show_task again')
 
 
+
+
+# the function is a callback request handler. It is called when you click on the calendar buttons
+@bot.callback_query_handler(func=lambda call: call.data.startswith(calendar_1.prefix))
+def callback_inline(call: types.CallbackQuery, session=None):
+    name, action, year, month, day = call.data.split(calendar_1.sep)
+    date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
+    if action == 'DAY':
+        c_date = date.strftime("%d.%m.%Y")
+        msg = bot.send_message(chat_id=call.message.chat.id, text=f'You chose {c_date}, please enter your plan.\nFormat your plan this way: task_name|assignee|remarks: ')
+        bot.register_next_step_handler(msg, lambda message: add_task_module(message, chat_id=call.message.chat.id, c_date=c_date))
+    elif action == 'CANCEL':
+        bot.send_message(chat_id=call.message.chat.id, text='🚫 Cancelled')
+        
+        
 # the function of adding a new task
-def add_task(message, chat_id, c_date):
+def add_task_module(session, message, chat_id, c_date):
     try:
         add_todo(chat_id, c_date, message)
         text = f'Task successfully registered on {c_date}'
