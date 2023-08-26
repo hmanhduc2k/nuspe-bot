@@ -10,7 +10,7 @@ Base = declarative_base()
 class Tasks(Base):
     __tablename__ = 'tasks'
     
-    task_id = Column(UUID(as_uuid=True), primary_key=True, default=str(uuid.uuid4))
+    task_id = Column(String, primary_key=True, default=str(uuid.uuid4))
     event_id = Column(String, ForeignKey('reminders.reminder_id'), default=None)
     chat_id = Column(String)
     task_name = Column(String, nullable=False)
@@ -22,12 +22,12 @@ class Tasks(Base):
 class Reminder(Base):
     __tablename__ = 'reminders'
     
-    reminder_id = Column(UUID(as_uuid=True), primary_key=True, default=str(uuid.uuid4))
+    reminder_id = Column(String, primary_key=True, default=str(uuid.uuid4))
     task_id = Column(String, ForeignKey('tasks.task_id'), default=None)
     reminder_time = Column(DateTime)
     
 class Event(Base):
     __tablename__ = 'events'
     
-    event_id = Column(UUID(as_uuid=True), primary_key=True, default=str(uuid.uuid4))
+    event_id = Column(String, primary_key=True, default=str(uuid.uuid4))
     event_name = Column(String)
