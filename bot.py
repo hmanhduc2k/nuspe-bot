@@ -12,8 +12,8 @@ import threading
 import csv
 import uuid
 from collections import defaultdict
-from models import Tasks
-from models import Session
+from database.model import Tasks
+from database.database import Session
 from sqlalchemy import cast, Date, extract
 from sqlalchemy.sql.expression import and_, or_
 
