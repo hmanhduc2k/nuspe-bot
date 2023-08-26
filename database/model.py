@@ -4,7 +4,8 @@ from sqlalchemy import create_engine, Column, Integer, String, TIMESTAMP, Date, 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from database.database import Base
+
+Base = declarative_base()
 
 class Tasks(Base):
     __tablename__ = 'tasks'
