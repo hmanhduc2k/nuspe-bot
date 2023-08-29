@@ -17,7 +17,9 @@ from database.database import Session
 from sqlalchemy import cast, Date, extract
 from sqlalchemy.sql.expression import and_, or_
 
-def add_task(session, payload):
+from bot import session
+
+def add_task(payload):
     try:
         message = payload['message']
         task, assignee, remarks = message.text.split('|')

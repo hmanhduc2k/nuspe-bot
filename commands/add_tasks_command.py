@@ -51,14 +51,14 @@ def attach_callback(bot_instance):
   
         
 # the function of adding a new task
-def add_task_temp(bot, session, message, chat_id, c_date):
+def add_task_temp(bot, message, chat_id, c_date):
     try:
         payload = {
             'message': message,
             'chat_id': chat_id,
             'date': c_date
         }
-        crud.add_task(session, payload)
+        crud.add_task(payload)
         text = f'Task successfully registered on {c_date}'
         bot.send_message(chat_id=chat_id, text=text)
     except:
