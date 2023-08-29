@@ -17,14 +17,13 @@ from database.database import Session
 from sqlalchemy import cast, Date, extract
 from sqlalchemy.sql.expression import and_, or_
 
-from commands import add_task_module, start_module, help_module, add_tasks_command
+from commands import add_task_module, start_module, help_module, add_tasks_command, show_task_command
 
 session = Session()
 
 TOKEN = '6177637545:AAH-qY4PytR-CGyCrG_OvpTrckaHpZ5Kv68'
 bot = telebot.TeleBot(TOKEN)
 calendar = Calendar(language=ENGLISH_LANGUAGE)
-calendar_1 = CallbackData('calendar_1', 'action', 'year', 'month', 'day')
 calendar_2 = CallbackData('calendar_2', 'action', 'year', 'month', 'day')
 calendar_3 = CallbackData('calendar_3', 'action', 'year', 'month', 'day')
 
@@ -37,7 +36,9 @@ start_module.attach(bot)
 help_module.attach(bot)
 add_tasks_command.attach(bot)
 add_tasks_command.attach_callback(bot)
-
+show_task_command.attach_show(bot)
+show_task_command.attach_show_callback_1(bot)
+show_task_command.attach_show_callback_2(bot)
         
 @bot.message_handler(commands=['showing'])
 def test_show_task(message):
@@ -50,7 +51,7 @@ def test_show_task(message):
     
 @bot.callback_query_handler(func=lambda call: call.data.startswith(calendar_2.prefix))
 def callback_1(call: types.CallbackQuery):
-    name, action, year, month, day = call.data.split(calendar_1.sep)
+    name, action, year, month, day = call.data.split(calendar_2.sep)
     date = calendar.calendar_query_handler(bot=bot, call=call, name=name, action=action, year=year, month=month, day=day)
     if action == 'DAY':
         c_date = date.strftime("%d.%m.%Y")

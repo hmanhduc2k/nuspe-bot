@@ -66,7 +66,7 @@ def delete_task(session, task_id):
     except Exception as e:
         session.rollback()
         
-def show_task_by_date(session, chat_id, start_date, end_date):
+def show_task_by_date(chat_id, start_date, end_date):
     return session.query(Tasks).filter(
                 and_(Tasks.chat_id == str(chat_id), Tasks.status =='ongoing')
             ).filter(

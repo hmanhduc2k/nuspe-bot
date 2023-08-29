@@ -40,9 +40,7 @@ def attach_callback(bot_instance):
             bot_instance.register_next_step_handler(msg, lambda message: add_task_temp(bot_instance, message, chat_id=call.message.chat.id, c_date=c_date))
         elif action == 'CANCEL':
             bot_instance.send_message(chat_id=call.message.chat.id, text='🚫 Cancelled')
-      
-  
-        
+           
 # the function of adding a new task
 def add_task_temp(bot, message, chat_id, c_date):
     payload = {
