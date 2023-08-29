@@ -45,14 +45,14 @@ def attach_callback(bot_instance):
         
 # the function of adding a new task
 def add_task_temp(bot, message, chat_id, c_date):
-    try:
-        payload = {
-            'message': message,
-            'chat_id': chat_id,
-            'date': c_date
-        }
-        crud.add_task(payload)
+    payload = {
+        'message': message,
+        'chat_id': chat_id,
+        'date': c_date
+    }
+    obj = crud.add_task(payload)
+    if obj:
         text = f'Task successfully registered on {c_date}'
         bot.send_message(chat_id=chat_id, text=text)
-    except:
+    else:
         bot.send_message(chat_id=chat_id, text='Error occurred! Please format your plan this way: \n[task name]|[assignee]|[remarks]\nLeave blank but keep the | if do not have')
