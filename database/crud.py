@@ -1,13 +1,21 @@
-import uuid
-
-from sqlalchemy import create_engine, Column, Integer, String, TIMESTAMP, Date, DateTime, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-import os
-from database.model import Base
-from database.model import Tasks, Event, Reminder
+import telebot
+from telebot import types
+from telebot_calendar import *
+import telebot_calendar
 import datetime
+from datetime import timedelta
+import schedule
+import sched
+import time
+import os
+import threading
+import csv
+import uuid
+from collections import defaultdict
+from database.model import Tasks, Event, Reminder
+from database.database import Session
+from sqlalchemy import cast, Date, extract
+from sqlalchemy.sql.expression import and_, or_
 
 def add_task(session, payload):
     try:
@@ -30,6 +38,22 @@ def add_task(session, payload):
         session.rollback()
         print('An error occurred: ', e)
         
+def add_event(session, payload):
+    try:
+        event_date = payload['date']
+        event_name = payload['name']
+        chat_id = payload['chat_id']
+        date_obj = datetime.datetime.strptime(event_date, "%d.%m.%Y")
+        event = Event(
+            chat_id=chat_id,
+            event_name=event_name,
+        )
+        session.add(event)
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        print('An error occurred', e)
+        
 def delete_task(session, task_id):
     try:
         target = session.query(Tasks).filter_by(task_id).first()
@@ -40,9 +64,13 @@ def delete_task(session, task_id):
     except Exception as e:
         session.rollback()
         
-def show_task_by_date():
-    pass
+def show_task_by_date(session, chat_id, start_date, end_date):
+    return session.query(Tasks).filter(
+                and_(Tasks.chat_id == str(chat_id), Tasks.status =='ongoing')
+            ).filter(
+                and_(extract('day', Tasks.task_deadlines - start_date) >= 0, extract('day', Tasks.task_deadlines - end_date) <= 0)
+            ).all()
 
-def show_task_by_assignee():
-    pass
+def show_task_by_assignee(session, chat_id, assignee):
+    return session.query(Tasks).filter_by(and_(Tasks.chat_id==str(chat_id), Tasks.assignee==assignee))
         

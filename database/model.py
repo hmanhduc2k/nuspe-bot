@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import create_engine, Column, Integer, String, TIMESTAMP, Date, DateTime, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, TIMESTAMP, Date, DateTime, ForeignKey, ARRAY
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -14,7 +14,7 @@ class Tasks(Base):
     event_id = Column(String, ForeignKey('reminders.reminder_id'), default=None)
     chat_id = Column(String)
     task_name = Column(String, nullable=False)
-    task_assignee = Column(String, default='None')
+    task_assignee = Column(ARRAY(String))
     task_deadlines = Column(DateTime, nullable=False)
     task_remarks = Column(String, default='None')
     status = Column(String, default='ongoing')
