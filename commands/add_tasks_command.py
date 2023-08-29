@@ -4,13 +4,6 @@ from telebot_calendar import *
 import telebot_calendar
 import datetime
 from datetime import timedelta
-import schedule
-import sched
-import time
-import os
-import threading
-import csv
-import uuid
 from collections import defaultdict
 from database.model import Tasks
 from sqlalchemy import cast, Date, extract

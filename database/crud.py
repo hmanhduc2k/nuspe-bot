@@ -17,7 +17,7 @@ from database.database import Session
 from sqlalchemy import cast, Date, extract
 from sqlalchemy.sql.expression import and_, or_
 
-from bot import session
+session = Session()
 
 def add_task(payload):
     try:
